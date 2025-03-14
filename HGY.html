@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oswestry Latest News</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oswestry Latest News</title>
+</head>
+<body>
+    <h1>Latest News from Oswestry</h1>
+    <div id="news-container">Loading latest headlines...</div>
+    
+    <script>
+        async function fetchNews() {
+            const newsContainer = document.getElementById('news-container');
+            newsContainer.innerHTML = 'Loading latest headlines...'; // Initial message
+
+            try {
+                // 1. Fetch the Shropshire Star RSS Feed (General News Feed)
+                const response = await fetch('https://www.shropshirestar.com/feed');
+                const data = await response.text(); // Get the raw XML response
+
+                // 2. Parse the RSS feed XML using DOMParser
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(data, 'text/xml');
+                
+                // 3. Extract the 'item' elements (representing individual news articles)
+                const items = xmlDoc.getElementsByTagName('item');
+
+                // 4. Loop through each item and display the title and full URL
+                for (let i = 0; i < items.length; i++) {
+                    const title = items[i].getElementsByTagName('title')[0].textContent; // Get the title of the news article
+                    const link = items[i].getElementsByTagName('link')[0].textContent; // Get the URL of the article
+
+                    // 5. Display the title and URL as plain text (without making it a clickable link)
+                    const headline = document.createElement('p'); // Create a new paragraph for each headline
+                    headline.innerHTML = `<strong>${title}</strong><br><a href="${link}" target="_blank">${link}</a>`;
+                    newsContainer.appendChild(headline); // Add each headline to the news container
+                }
+            } catch (error) {
+                newsContainer.innerHTML = 'Failed to load news headlines.';
+                console.error('Error fetching news:', error); // Log the error if fetching fails
+            }
+        }
+
+        // 6. Call the function when the page is loaded
+        window.onload = fetchNews;
+    </script>
+</body>
+</html>
